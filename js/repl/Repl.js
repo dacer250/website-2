@@ -47,6 +47,7 @@ type State = {
   code: string,
   compiled: ?string,
   ast: ?any,
+  transformTime: ?number,
   compileErrorMessage: ?string,
   debugEnvPreset: boolean,
   envConfig: EnvConfig,
@@ -102,6 +103,7 @@ class Repl extends React.Component {
       code: persistedState.code,
       compiled: null,
       ast: null,
+      transformTime: null,
       compileErrorMessage: null,
       debugEnvPreset: persistedState.debug,
       envConfig,
@@ -181,26 +183,35 @@ class Repl extends React.Component {
         />
 
         <div className={styles.panels}>
-          <CodeMirrorPanel
-            className={styles.codeMirrorPanel}
-            code={state.code}
-            errorMessage={state.compileErrorMessage}
-            onChange={this._updateCode}
-            autoFocus
-            options={options}
-            placeholder="Write code here"
-          />
+          <div className={styles.leftPanel}>
+            <div className={styles.leftToolbar} />
+            <CodeMirrorPanel
+              className={styles.codeMirrorPanelLeft}
+              code={state.code}
+              errorMessage={state.compileErrorMessage}
+              onChange={this._updateCode}
+              autoFocus
+              options={options}
+              placeholder="Write code here"
+            />
+          </div>
 
           <Tabs
             className={styles.tabs}
             selectedTabClassName={styles.tabSelected}
+            selectedTabPanelClassName={styles.tabPanelActive}
           >
             <TabList className={styles.tabList}>
               <Tab className={styles.tab}>Output</Tab>
               <Tab className={styles.tab}>AST</Tab>
+              <div className={styles.transformTime}>
+                {state.transformTime}
+                ms
+              </div>
             </TabList>
             <TabPanel className={styles.tabPanel}>
               <CodeMirrorPanel
+                className={styles.codeMirrorPanelRight}
                 code={state.compiled}
                 errorMessage={state.evalErrorMessage}
                 info={state.debugEnvPreset ? state.envPresetDebugInfo : null}
@@ -210,6 +221,7 @@ class Repl extends React.Component {
             </TabPanel>
             <TabPanel className={styles.tabPanel}>
               <CodeMirrorPanel
+                className={styles.codeMirrorPanelRight}
                 errorMessage={""}
                 code={state.ast}
                 options={{
@@ -327,6 +339,7 @@ class Repl extends React.Component {
         {
           compiled: null,
           ast: null,
+          transformTime: null,
           compileErrorMessage: null,
           envPresetDebugInfo: null,
           evalErrorMessage: null,
@@ -510,9 +523,12 @@ const styles = {
     margin: "auto",
     textAlign: "center",
   }),
-  codeMirrorPanel: css({
-    flex: "0 0 50%",
-    marginTop: "31px",
+  codeMirrorPanelLeft: css({
+    flex: "1",
+    height: "auto",
+  }),
+  codeMirrorPanelRight: css({
+    height: "100%",
   }),
   optionsColumn: css({
     flex: "0 0 auto",
@@ -541,6 +557,7 @@ const styles = {
     padding: "0",
     paddingLeft: "29px",
     backgroundColor: colors.inverseBackgroundDark,
+    height: "31px",
   }),
   tab: css({
     color: "#9da5b4",
@@ -562,7 +579,11 @@ const styles = {
     },
   }),
   tabPanel: css({
-    height: "100%",
+    display: "none",
+    flex: "1",
+  }),
+  tabPanelActive: css({
+    display: "block",
   }),
   panels: css({
     backgroundColor: colors.inverseBackgroundDark,
@@ -572,5 +593,23 @@ const styles = {
     flexDirection: "row",
     justifyContent: "stretch",
     overflow: "auto",
+  }),
+  leftPanel: css({
+    flex: "0 0 50%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "stretch",
+    height: "100%",
+    width: "100%",
+  }),
+  leftToolbar: css({
+    flex: "0 0 auto",
+    height: "31px",
+    width: "100%",
+  }),
+  transformTime: css({
+    float: "right",
+    color: colors.inverseForegroundDark,
+    padding: "6px 12px",
   }),
 };

@@ -56,6 +56,7 @@ const styles = {
     height: "100%",
     width: "100%",
     overflow: "auto",
+    position: "relative",
   }),
   error: css({
     order: 2,
@@ -72,7 +73,8 @@ const styles = {
     ...sharedBoxStyles,
   }),
   panel: css({
-    height: "100%",
-    position: "relative",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "stretch",
   }),
 };

@@ -34,7 +34,13 @@ export default class WorkerApi {
         config,
       })
       .then(
-        ({ compiled, compileErrorMessage, envPresetDebugInfo, sourceMap }) => {
+        ({
+          compiled,
+          ast,
+          compileErrorMessage,
+          envPresetDebugInfo,
+          sourceMap,
+        }) => {
           let evalErrorMessage = null;
 
           // Compilation is done in a web worker for performance reasons,
@@ -49,6 +55,7 @@ export default class WorkerApi {
 
           return {
             compiled,
+            ast,
             compileErrorMessage,
             envPresetDebugInfo,
             evalErrorMessage,

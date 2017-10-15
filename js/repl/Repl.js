@@ -5,6 +5,7 @@ import "regenerator-runtime/runtime";
 import { css } from "emotion";
 import debounce from "lodash.debounce";
 import React from "react";
+import { Tabs, Tab, TabPanel, TabList } from "react-tabs";
 import ErrorBoundary from "./ErrorBoundary";
 import CodeMirrorPanel from "./CodeMirrorPanel";
 import ReplOptions from "./ReplOptions";
@@ -45,6 +46,7 @@ type State = {
   builtIns: boolean,
   code: string,
   compiled: ?string,
+  ast: ?any,
   compileErrorMessage: ?string,
   debugEnvPreset: boolean,
   envConfig: EnvConfig,
@@ -99,6 +101,7 @@ class Repl extends React.Component {
       builtIns: persistedState.builtIns,
       code: persistedState.code,
       compiled: null,
+      ast: null,
       compileErrorMessage: null,
       debugEnvPreset: persistedState.debug,
       envConfig,
@@ -183,17 +186,43 @@ class Repl extends React.Component {
             code={state.code}
             errorMessage={state.compileErrorMessage}
             onChange={this._updateCode}
+            autoFocus
             options={options}
             placeholder="Write code here"
           />
-          <CodeMirrorPanel
-            className={styles.codeMirrorPanel}
-            code={state.compiled}
-            errorMessage={state.evalErrorMessage}
-            info={state.debugEnvPreset ? state.envPresetDebugInfo : null}
-            options={options}
-            placeholder="Compiled output will be shown here"
-          />
+
+          <Tabs
+            className={styles.tabs}
+            selectedTabClassName={styles.tabSelected}
+          >
+            <TabList className={styles.tabList}>
+              <Tab className={styles.tab}>Output</Tab>
+              <Tab className={styles.tab}>AST</Tab>
+            </TabList>
+            <TabPanel className={styles.tabPanel}>
+              <CodeMirrorPanel
+                code={state.compiled}
+                errorMessage={state.evalErrorMessage}
+                info={state.debugEnvPreset ? state.envPresetDebugInfo : null}
+                options={options}
+                placeholder="Compiled output will be shown here"
+              />
+            </TabPanel>
+            <TabPanel className={styles.tabPanel}>
+              <CodeMirrorPanel
+                errorMessage={""}
+                code={state.ast}
+                options={{
+                  ...options,
+                  lineWrapping: false,
+                  mode: { name: "javascript", json: true },
+                  foldGutter: true,
+                  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                }}
+                placeholder="AST will be shown here"
+              />
+            </TabPanel>
+          </Tabs>
         </div>
       </div>
     );
@@ -292,6 +321,21 @@ class Repl extends React.Component {
   _compile = (code: string, setStateCallback: () => mixed) => {
     const { state } = this;
     const { runtimePolyfillState } = state;
+
+    if (!code) {
+      this.setState(
+        {
+          compiled: null,
+          ast: null,
+          compileErrorMessage: null,
+          envPresetDebugInfo: null,
+          evalErrorMessage: null,
+          sourceMap: null,
+        },
+        setStateCallback
+      );
+      return;
+    }
 
     const presetsArray = this._presetsToArray(state);
 
@@ -468,6 +512,7 @@ const styles = {
   }),
   codeMirrorPanel: css({
     flex: "0 0 50%",
+    marginTop: "31px",
   }),
   optionsColumn: css({
     flex: "0 0 auto",
@@ -484,7 +529,43 @@ const styles = {
       flexDirection: "column",
     },
   }),
+  tabs: css({
+    flex: "0 0 50%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "stretch",
+  }),
+  tabList: css({
+    margin: "0",
+    padding: "0",
+    paddingLeft: "29px",
+    backgroundColor: colors.inverseBackgroundDark,
+  }),
+  tab: css({
+    color: "#9da5b4",
+    display: "inline-block",
+    position: "relative",
+    listStyle: "none",
+    padding: "6px 12px",
+    cursor: "pointer",
+    transition: "background-color 250ms ease-in-out, color 250ms ease-in-out",
+    "&:hover": {
+      backgroundColor: colors.inverseBackground,
+      color: colors.inverseForeground,
+    },
+  }),
+  tabSelected: css({
+    backgroundColor: colors.inverseBackgroundLight,
+    "&:hover": {
+      backgroundColor: colors.inverseBackgroundLight,
+    },
+  }),
+  tabPanel: css({
+    height: "100%",
+  }),
   panels: css({
+    backgroundColor: colors.inverseBackgroundDark,
     height: "100%",
     width: "100%",
     display: "flex",

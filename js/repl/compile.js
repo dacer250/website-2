@@ -9,6 +9,7 @@ import type { BabelPresetEnvResult, CompileConfig } from "./types";
 
 type Return = {
   compiled: ?string,
+  ast: ?any,
   compileErrorMessage: ?string,
   envPresetDebugInfo: ?string,
   sourceMap: ?string,
@@ -18,6 +19,7 @@ export default function compile(code: string, config: CompileConfig): Return {
   const { envConfig } = config;
 
   let compiled = null;
+  let ast = null;
   let compileErrorMessage = null;
   let envPresetDebugInfo = null;
   let sourceMap = null;
@@ -64,6 +66,7 @@ export default function compile(code: string, config: CompileConfig): Return {
     });
 
     compiled = transformed.code;
+    ast = JSON.stringify(transformed.ast, null, 2);
 
     if (config.sourceMap) {
       try {
@@ -74,6 +77,7 @@ export default function compile(code: string, config: CompileConfig): Return {
     }
   } catch (error) {
     compiled = null;
+    ast = null;
     compileErrorMessage = error.message;
     envPresetDebugInfo = null;
     sourceMap = null;
@@ -81,6 +85,7 @@ export default function compile(code: string, config: CompileConfig): Return {
 
   return {
     compiled,
+    ast,
     compileErrorMessage,
     envPresetDebugInfo,
     sourceMap,

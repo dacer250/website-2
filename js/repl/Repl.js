@@ -587,7 +587,7 @@ const styles = {
   }),
   panels: css({
     backgroundColor: colors.inverseBackgroundDark,
-    height: "100%",
+    flex: "1",
     width: "100%",
     display: "flex",
     flexDirection: "row",

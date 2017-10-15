@@ -19,6 +19,7 @@ export default function compile(code: string, config: CompileConfig): Return {
   const { envConfig } = config;
 
   let compiled = null;
+  let transformTime = null;
   let ast = null;
   let compileErrorMessage = null;
   let envPresetDebugInfo = null;
@@ -58,12 +59,15 @@ export default function compile(code: string, config: CompileConfig): Return {
   }
 
   try {
+    const start = Date.now();
     const transformed = Babel.transform(code, {
       babelrc: false,
       filename: "repl",
       presets: config.presets,
       sourceMap: config.sourceMap,
     });
+
+    transformTime = Date.now() - start;
 
     compiled = transformed.code;
     ast = JSON.stringify(transformed.ast, null, 2);
@@ -78,6 +82,7 @@ export default function compile(code: string, config: CompileConfig): Return {
   } catch (error) {
     compiled = null;
     ast = null;
+    transformTime = null;
     compileErrorMessage = error.message;
     envPresetDebugInfo = null;
     sourceMap = null;
@@ -85,6 +90,7 @@ export default function compile(code: string, config: CompileConfig): Return {
 
   return {
     compiled,
+    transformTime,
     ast,
     compileErrorMessage,
     envPresetDebugInfo,

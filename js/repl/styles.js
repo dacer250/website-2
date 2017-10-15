@@ -14,6 +14,7 @@ const colors = {
   inverseBackgroundLight: "#292d36",
   inverseForeground: "#ffffff",
   inverseForegroundLight: "#9da5b4",
+  inverseForegroundDark: "#666666",
 
   // Inspired by: Chrome's console.warn() colors
   infoBackground: "#fffbe5",

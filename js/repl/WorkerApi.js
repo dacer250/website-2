@@ -37,6 +37,7 @@ export default class WorkerApi {
         ({
           compiled,
           ast,
+          transformTime,
           compileErrorMessage,
           envPresetDebugInfo,
           sourceMap,
@@ -56,6 +57,7 @@ export default class WorkerApi {
           return {
             compiled,
             ast,
+            transformTime,
             compileErrorMessage,
             envPresetDebugInfo,
             evalErrorMessage,

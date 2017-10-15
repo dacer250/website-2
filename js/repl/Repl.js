@@ -528,6 +528,7 @@ const styles = {
     height: "auto",
   }),
   codeMirrorPanelRight: css({
+    flex: "1",
     height: "100%",
   }),
   optionsColumn: css({
@@ -583,7 +584,7 @@ const styles = {
     flex: "1",
   }),
   tabPanelActive: css({
-    display: "block",
+    display: "flex",
   }),
   panels: css({
     backgroundColor: colors.inverseBackgroundDark,
